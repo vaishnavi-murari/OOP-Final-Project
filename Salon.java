@@ -134,15 +134,28 @@ public class Salon implements Serializable{
      * Adds the given range of days/times to the salon's list of days/times that it's closed.
      * This method will insert the new closure time in the list so that the list maintains chronological
      * order by start time.
+     *
+     * This method will also cancel any appointments that were scheduled to take place during the new
+     * closure time.
      * 
      * @param timesToBeClosed   a range of time when the salon should now be closed
      */
     public void closeSalon (DateTimeRange timesToBeClosed) {
+        // Adds the range of times to the salon's closed hours
         int index = 0;
         while (index < salonClosed.size() && timesToBeClosed.startsAfter(salonClosed.get(index))) {
             index++;
         }
         salonClosed.add(index, timesToBeClosed);
+
+        // Cancels any appointments scheduled during timesToBeClosed
+        for(int i=0; i<appointments.size(); i++) {
+            Appointment a = appointments.get(i);
+            DateTimeRange apptDuration = new DateTimeRange(a.getDateTime(), a.getDateTime().plusMinutes(a.getService().getLength()));
+            if(apptDuration.conflictsWith(timesToBeClosed)) {
+                appointments.remove(a);
+            }
+        }
     }
 
     /*
