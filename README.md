@@ -7,4 +7,5 @@ This is a system for a hair salon to manage appointment bookings. This system wi
 We have a preset list of services and stylists already available at the salon.
 
 Salon Owner Login Username: JV
+
 Salon Owner Login Password: OOPFinalProject
