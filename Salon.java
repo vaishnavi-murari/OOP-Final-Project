@@ -141,12 +141,14 @@ public class Salon implements Serializable{
      * @param timesToBeClosed   a range of time when the salon should now be closed
      */
     public void closeSalon (DateTimeRange timesToBeClosed) {
+        // Adds the range of times to the salon's closed hours
         int index = 0;
         while (index < salonClosed.size() && timesToBeClosed.startsAfter(salonClosed.get(index))) {
             index++;
         }
         salonClosed.add(index, timesToBeClosed);
 
+        // Cancels any appointments scheduled during timesToBeClosed
         for(int i=0; i<appointments.size(); i++) {
             Appointment a = appointments.get(i);
             DateTimeRange apptDuration = new DateTimeRange(a.getDateTime(), a.getDateTime().plusMinutes(a.getService().getLength()));
