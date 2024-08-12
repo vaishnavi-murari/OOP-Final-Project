@@ -31,7 +31,7 @@ public class OwnerHandler {
     private void manageSalon() {
         int option = 0;
         while (option != 6) {
-            System.out.println("\nManage Salon - Choose an option:");
+            System.out.println("\nChoose an option:");
             System.out.println("1. View Salon Schedule");
             System.out.println("2. View Pending Appointments");
             System.out.println("3. Modify Salon Hours");
