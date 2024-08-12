@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /*
  * Name: Vaishnavi Murari
- * Date: August 11, 2024
+ * Date: August 12, 2024
  */
 public class Salon implements Serializable{
     private ArrayList<Appointment> appointments;
@@ -103,14 +103,14 @@ public class Salon implements Serializable{
      */
     public void printAllAppointments () {
         System.out.println("Salon Schedule");
-        System.out.println("------------------------------------------------------------------------------------------");
-        System.out.printf("%-2s | %-18s | %-20s | %-24s | %-16s | %-16s | %-16s\n", "ID", "Date/Time", "Service", "Stylist", "Client Name", "Client Contact", "Status");
-        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("%-2s | %-26s | %-16s | %-24s | %-16s | %-16s | %-16s\n", "ID", "Date/Time", "Service", "Stylist", "Client Name", "Client Contact", "Status");
+        System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
         for(int i=0; i<appointments.size();i++) {
             System.out.printf("%-2s | ", i);
             appointments.get(i).printInfo();
         }
-        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
     }
 
     /*
@@ -118,22 +118,25 @@ public class Salon implements Serializable{
      */
     public void printPendingAppointments(){
         System.out.println("Pending Appointments");
-        System.out.println("------------------------------------------------------------------------------------------");
-        System.out.printf("%-2s | %-18s | %-20s | %-24s | %-16s | %-16s\n", "ID", "Date/Time", "Service", "Stylist", "Client Name", "Client Contact");
-        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------------------------------------");
+        System.out.printf("%-2s | %-26s | %-16s | %-24s | %-16s | %-16s\n", "ID", "Date/Time", "Service", "Stylist", "Client Name", "Client Contact");
+        System.out.println("-----------------------------------------------------------------------------------------------------------------");
         for(int i=0; i<appointments.size();i++) {
             if (appointments.get(i).getStatus().equals("Pending")){
                 System.out.printf("%-2s | ", i);
                 appointments.get(i).printInfo();
             }
         }
-        System.out.println("------------------------------------------------------------------------------------------");
+        System.out.println("-----------------------------------------------------------------------------------------------------------------");
     }
 
     /*
      * Adds the given range of days/times to the salon's list of days/times that it's closed.
      * This method will insert the new closure time in the list so that the list maintains chronological
      * order by start time.
+     * 
+     * This method will also cancel any appointments that were scheduled to take place during the new
+     * closure time.
      * 
      * @param timesToBeClosed   a range of time when the salon should now be closed
      */
@@ -143,6 +146,14 @@ public class Salon implements Serializable{
             index++;
         }
         salonClosed.add(index, timesToBeClosed);
+
+        for(int i=0; i<appointments.size(); i++) {
+            Appointment a = appointments.get(i);
+            DateTimeRange apptDuration = new DateTimeRange(a.getDateTime(), a.getDateTime().plusMinutes(a.getService().getLength()));
+            if(apptDuration.conflictsWith(timesToBeClosed)) {
+                appointments.remove(a);
+            }
+        }
     }
 
     /*
@@ -213,4 +224,5 @@ public class Salon implements Serializable{
     public void setLoginPassword(String pass) {
         loginPassword = pass;
     }
+
 }

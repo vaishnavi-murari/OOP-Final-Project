@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /*
  * Name: Vaishnavi Murari
- * Date: August 11, 2024
+ * Date: August 12, 2024
  */
 public class DateTimeRange implements Serializable{
     private LocalDateTime startDateTime;
@@ -19,7 +19,7 @@ public class DateTimeRange implements Serializable{
     }
 
     public DateTimeRange (String start, String end) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("E, MMM dd HH:mm a");
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("E, MMM dd, yyyy h:mm a");
         startDateTime = LocalDateTime.parse(start, format);
         endDateTime = LocalDateTime.parse(end, format);
     }
@@ -50,10 +50,10 @@ public class DateTimeRange implements Serializable{
 
     /*
      * Overrides the Object toString() method
-     * @return  a String of the format "E, MMM dd HH:mm a - E, MMM dd HH:mm a"
+     * @return  a String of the format "E, MMM dd, yyyy h:mm a - E, MMM dd, yyyy h:mm a"
      */
     public String toString(){
-        DateTimeFormatter form = DateTimeFormatter.ofPattern("E, MMM dd HH:mm a");
+        DateTimeFormatter form = DateTimeFormatter.ofPattern("E, MMM dd, yyyy h:mm a");
         String start = startDateTime.format(form);
         String end = endDateTime.format(form);
         return start + " - " + end;

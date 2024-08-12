@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /*
  * Name: Vaishnavi Murari
- * Date: August 11, 2024
+ * Date: August 12, 2024
  */
 public class Appointment implements Serializable{
     private LocalDateTime dateTime;
@@ -29,8 +29,8 @@ public class Appointment implements Serializable{
      * Prints a client-friendly overview of the appointment details.
      */
     public void printDetails(){
-        DateTimeFormatter dayForm = DateTimeFormatter.ofPattern("E, MMM dd");
-        DateTimeFormatter timeForm = DateTimeFormatter.ofPattern("HH:mm a");
+        DateTimeFormatter dayForm = DateTimeFormatter.ofPattern("E, MMM dd, yyyy");
+        DateTimeFormatter timeForm = DateTimeFormatter.ofPattern("h:mm a");
         String apptDate = dateTime.format(dayForm);
         String apptTime = dateTime.format(timeForm);
         
@@ -53,9 +53,9 @@ public class Appointment implements Serializable{
      * Prints out the formatted info of the appointment.
      */
     public void printInfo() {
-        DateTimeFormatter form = DateTimeFormatter.ofPattern("E, MMM dd HH:mm a");
+        DateTimeFormatter form = DateTimeFormatter.ofPattern("E, MMM dd, yyyy h:mm a");
         String apptDateTime = dateTime.format(form);
-        System.out.printf("%-18s | %-20s | %-24s | %-16s | %-16s | %-16s\n", apptDateTime, service.getName(), stylist.getName(), clientName, clientContact, status);
+        System.out.printf("%-26s | %-16s | %-24s | %-16s | %-16s | %-16s\n", apptDateTime, service.getName(), stylist.getName(), clientName, clientContact, status);
     }
 
     // GETTERS AND SETTERS
