@@ -14,14 +14,6 @@ public class ClientHandler {
         salon = sa;
     }
 
-    public Salon getSalon(){
-        return salon;
-    }
-
-    public void setSalon(Salon salonInfo){
-        salon = salonInfo;
-    }
-
     /*
      * Prompts the client to select an option for the program
      */
@@ -66,10 +58,10 @@ public class ClientHandler {
     }
 
     /*
-     * Prints all of the stylists trained to perform the client's chosen service and prompts the client to choose a stylist
+     * Prints all of the providers trained to perform the client's chosen service and prompts the client to choose a provider
      * 
      * @param   the client's chosen service
-     * @return  the client's chosen stylist
+     * @return  the client's chosen provider
      */
     private Provider printAndChooseProvider(Service service) {
         // Determines which stylists are trained to perform the service
@@ -95,9 +87,9 @@ public class ClientHandler {
     }
 
     /*
-     * Prints at least 5 dates/times the chosen stylist is available for an appointment and prompts the client to choose a date/time
+     * Prints at least 5 dates/times the chosen provider is available for an appointment and prompts the client to choose a date/time
      * 
-     * @param stylist   the client's chosen stylist
+     * @param provider   the client's chosen provider
      * @param service   the client's chosen service
      * @return          the client's chosen appointment date/time
      */
@@ -120,14 +112,16 @@ public class ClientHandler {
      * The available times will fall between 24 hours from today's date and 2 days after that.
      * These available times cannot be when the chosen provider is unavailable due to scheduled appointment or salon closure.
      * If at least 5 available times cannot be found within that time frame, then the process repeats with consecutive
-     * weeks until 5 available times can be found.
+     * ranges of 2 days until 5 available times can be found.
      * 
      * @precondition    the given provider is trained to perform the given service
-     * 
+     * @param provider  the client's chosen provider
+     * @param service   the client's chosen service
      * @return          an ArrayList of 5 possible ranges of time when the appointment could take place
      * 
      */
     private ArrayList<DateTimeRange> findAvailableRanges(Provider provider, Service service) {
+        // Local variables
         ArrayList<DateTimeRange> apptAvailability = new ArrayList<DateTimeRange>();
         ArrayList<DateTimeRange> providerUnavailable = provider.getUnavailable();
         int serviceLength = service.getDuration();
@@ -140,7 +134,7 @@ public class ClientHandler {
 
         // Runs until at least 5 times are found
         while(apptAvailability.size() < 5) {
-            // Runs until the search window has been completed
+            // Runs until the current search window has been completed
             while(!startSearch.isAfter(endSearch)) {
                 apptDuration = new DateTimeRange(startSearch, startSearch.plusMinutes(serviceLength));
                 conflictFound = false;
@@ -152,7 +146,7 @@ public class ClientHandler {
                         unavailIndex = i;
                     }
                 }
-                // Starts at the provider's next available time
+                // If a conflict was found, starts at the provider's next available time
                 if(conflictFound) {
                     startSearch = providerUnavailable.get(unavailIndex).getEndOfRange();
                 }
@@ -169,7 +163,7 @@ public class ClientHandler {
                     }
                 }
             }
-            // Sets the start of the new search window to 10 AM the morning after the end of the previous search window
+            // Sets the start of the new search window
             startSearch = endSearch;
             endSearch = startSearch.plusDays(2);
         }
@@ -284,5 +278,15 @@ public class ClientHandler {
             }
         }   
         scanner.nextLine(); 
+    }
+
+    // GETTERS AND SETTERS
+
+    public Salon getSalon(){
+        return salon;
+    }
+
+    public void setSalon(Salon salonInfo){
+        salon = salonInfo;
     }
 }

@@ -13,18 +13,21 @@ public abstract class Provider implements Serializable{
 
     /*
      * Blocks off a range of time in the provider's schedule so they're unavailable.
-     * This can either be due to a scheduled appointment or a salon closure.
+     * 
+     * @param block  a scheduled appointment time or a salon closure
      */
-    public void addToSchedule(DateTimeRange appt) {
+    public void addToSchedule(DateTimeRange block) {
         int index = 0;
-        while (index < unavailable.size() && appt.startsAfter(unavailable.get(index))) {
+        while (index < unavailable.size() && block.startsAfter(unavailable.get(index))) {
             index++;
         }
-        unavailable.add(index, appt);
+        unavailable.add(index, block);
     }
 
     /*
      * Frees up a range of time in the provider's schedule so they're available.
+     * 
+     * @param appt  the duration of an appointment being removed from the provider's schedule
      */
     public void removeFromSchedule(DateTimeRange appt) {
         unavailable.remove(appt);

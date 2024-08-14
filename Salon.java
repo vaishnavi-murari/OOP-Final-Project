@@ -44,6 +44,13 @@ public class Salon implements Serializable{
      * Creates a new appointment with the given information and adds it to the list of appointments.
      * This method will insert the new appointment in the list so that the list is in chronological
      * order of appointment time.
+     * 
+     * @param dt        the range of time from when the appointment starts to when it ends
+     * @param p         the client's chosen provider
+     * @param ser       the client's chosen service
+     * @param cName     the client-inputted name for the appointment
+     * @param cContact  the client-inputted contact info for the appointment
+     * @param cPayment  the client-inputted payment info for the appointment
      */
     public void addAppointment(DateTimeRange dt, Provider p, Service ser, String cName, String cContact, String cPayment) {
         BeautyAppointment a = chooseAppointmentType(dt, p, ser, cName, cContact, cPayment);
@@ -57,6 +64,14 @@ public class Salon implements Serializable{
 
     /*
      * Determines what type of appointment to create based on the type of provider
+     * 
+     * @param dt        the range of time from when the appointment starts to when it ends
+     * @param p         the client's chosen provider, whose type determines what kind of appointment to create
+     * @param ser       the client's chosen service
+     * @param cName     the client-inputted name for the appointment
+     * @param cContact  the client-inputted contact info for the appointment
+     * @param cPayment  the client-inputted payment info for the appointment
+     * @return          a beauty appointment of a more specific type
      */
     private BeautyAppointment chooseAppointmentType(DateTimeRange dt, Provider p, Service ser, String cName, String cContact, String cPayment) {
         BeautyAppointment a = null;
@@ -150,7 +165,7 @@ public class Salon implements Serializable{
      * order by start time.
      * 
      * This method will also cancel any appointments that were scheduled to take place during the new
-     * closure time.
+     * closure time and will update all providers' availability to reflect the new closure.
      * 
      * @param timesToBeClosed   a range of time when the salon should now be closed
      */
@@ -172,7 +187,6 @@ public class Salon implements Serializable{
         }
 
         // Updates all provider availability so they're unavailable when the salon should be closed
-
         for(int i=0; i<providers.size(); i++) {
             providers.get(i).addToSchedule(timesToBeClosed);
         }
@@ -183,6 +197,7 @@ public class Salon implements Serializable{
      * 
      * @param startDate     the date to begin calculating the expected revenue, in the form "E, MMM dd"
      * @param endDate       the date to end calculating the expected revenue, in the form "E, MMM dd"
+     * @return              the total cost of all services performed between startDate and endDate
      */
     public float calculateRevenue(String startDate, String endDate) {
         float revenue = 0;
