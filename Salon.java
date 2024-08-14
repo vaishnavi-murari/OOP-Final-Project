@@ -3,20 +3,21 @@ import java.time.LocalDateTime;
 import java.io.Serializable;
 
 /*
- * Name: Vaishnavi Murari
- * Date: August 12, 2024
+ * Last Updated: August 13, 2024
  */
 public class Salon implements Serializable{
-    private ArrayList<Appointment> appointments;
-    private ArrayList<Stylist> stylists;
+    private ArrayList<BeautyAppointment> appointments;
+    private ArrayList<Provider> providers;
     private ArrayList<Service> services;
     private ArrayList<DateTimeRange> salonClosed;
     private String loginUsername;
     private String loginPassword;
+    private final int hourOpen = 10;
+    private final int hourClosed = 17;
 
     public Salon(){
-        appointments = new ArrayList<Appointment>();
-        stylists = new ArrayList<Stylist>();
+        appointments = new ArrayList<BeautyAppointment>();
+        providers = new ArrayList<Provider>();
         services = new ArrayList<Service>();
         salonClosed = new ArrayList<DateTimeRange>();
         loginUsername = "JV";
@@ -30,7 +31,7 @@ public class Salon implements Serializable{
      * @param clientName    the name of a salon client
      * @return              the appointment associated with the given client name
      */
-    public Appointment findAppointment(String clientName) {
+    public BeautyAppointment findAppointment(String clientName) {
         for (int i=0; i < appointments.size(); i++) {
             if (appointments.get(i).getClientName().equals(clientName)) {
                 return appointments.get(i);
@@ -44,13 +45,25 @@ public class Salon implements Serializable{
      * This method will insert the new appointment in the list so that the list is in chronological
      * order of appointment time.
      */
-    public void addAppointment(LocalDateTime dt, Stylist styl, Service ser, String cName, String cContact, String cPayment) {
-        Appointment a = new Appointment(dt, styl, ser, cName, cContact, cPayment);
+    public void addAppointment(DateTimeRange dt, Provider p, Service ser, String cName, String cContact, String cPayment) {
+        BeautyAppointment a = chooseAppointmentType(dt, p, ser, cName, cContact, cPayment);
         int index = 0;
-        while (index < appointments.size() && dt.isAfter(appointments.get(index).getDateTime())) {
+        while (index < appointments.size() && dt.startsAfter(appointments.get(index).getDateTime())) {
             index++;
         }
         appointments.add(index, a);
+        p.addToSchedule(dt);
+    }
+
+    /*
+     * Determines what type of appointment to create based on the type of provider
+     */
+    private BeautyAppointment chooseAppointmentType(DateTimeRange dt, Provider p, Service ser, String cName, String cContact, String cPayment) {
+        BeautyAppointment a = null;
+        if (p.getType().equals("hairstylist")) {
+            a = new HairAppointment(dt, (Stylist) p, ser, cName, cContact, cPayment);
+        }
+        return a;
     }
 
     /*
@@ -60,7 +73,7 @@ public class Salon implements Serializable{
      * @return      true if the appointment exists; otherwise,
      *              false
      */
-    public boolean printApptDetails(Appointment a) {
+    public boolean printApptDetails(BeautyAppointment a) {
         if (a != null) {
             a.printDetails();
             return true;
@@ -74,13 +87,14 @@ public class Salon implements Serializable{
      * @precondition        a is an existing appointment in the salon
      * @param a             the appointment being canceled
      */
-    public void cancelAppointment(Appointment a) {
+    public void cancelAppointment(BeautyAppointment a) {
         LocalDateTime oneDayFromNow = LocalDateTime.now().plusHours(24);
-        if (oneDayFromNow.isAfter(a.getDateTime())) {
-            System.out.printf("\nYou will be charged a cancellation fee of $%.2f.\n", a.getService().getCost()/2);
+        if (oneDayFromNow.isAfter(a.getDateTime().getStartOfRange())) {
+            System.out.printf("\nYou will be charged a cancellation fee of $%.2f.\n", a.getService().getPrice()/2);
         }
         appointments.remove(a);
-        System.out.println("Your appointment has been successfully cancelled.");
+        a.getProvider().removeFromSchedule(a.getDateTime());
+        System.out.println("\nYour appointment has been successfully cancelled.");
     }
 
     /*
@@ -104,10 +118,10 @@ public class Salon implements Serializable{
     public void printAllAppointments () {
         System.out.println("Salon Schedule");
         System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-2s | %-26s | %-16s | %-24s | %-16s | %-16s | %-16s\n", "ID", "Date/Time", "Service", "Stylist", "Client Name", "Client Contact", "Status");
+        System.out.printf("%-2s | %-26s | %-14s | %-16s | %-20s | %-20s | %-12s\n", "ID", "Date/Time", "Service", "Provider", "Client Name", "Client Contact", "Status");
         System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
         for(int i=0; i<appointments.size();i++) {
-            System.out.printf("%-2s | ", i);
+            System.out.printf("%-2s | ", i+1);
             appointments.get(i).printInfo();
         }
         System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
@@ -118,16 +132,16 @@ public class Salon implements Serializable{
      */
     public void printPendingAppointments(){
         System.out.println("Pending Appointments");
-        System.out.println("-----------------------------------------------------------------------------------------------------------------");
-        System.out.printf("%-2s | %-26s | %-16s | %-24s | %-16s | %-16s\n", "ID", "Date/Time", "Service", "Stylist", "Client Name", "Client Contact");
-        System.out.println("-----------------------------------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("%-2s | %-26s | %-14s | %-16s | %-20s | %-20s | %-12s\n", "ID", "Date/Time", "Service", "Provider", "Client Name", "Client Contact", "Status");
+        System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
         for(int i=0; i<appointments.size();i++) {
-            if (appointments.get(i).getStatus().equals("Pending")){
-                System.out.printf("%-2s | ", i);
+            if(appointments.get(i).getStatus().equals("Pending")) {
+                System.out.printf("%-2s | ", i+1);
                 appointments.get(i).printInfo();
             }
         }
-        System.out.println("-----------------------------------------------------------------------------------------------------------------");
+        System.out.println("------------------------------------------------------------------------------------------------------------------------------------");
     }
 
     /*
@@ -150,11 +164,17 @@ public class Salon implements Serializable{
 
         // Cancels any appointments scheduled during timesToBeClosed
         for(int i=0; i<appointments.size(); i++) {
-            Appointment a = appointments.get(i);
-            DateTimeRange apptDuration = new DateTimeRange(a.getDateTime(), a.getDateTime().plusMinutes(a.getService().getLength()));
+            BeautyAppointment a = appointments.get(i);
+            DateTimeRange apptDuration = a.getDateTime();
             if(apptDuration.conflictsWith(timesToBeClosed)) {
                 appointments.remove(a);
             }
+        }
+
+        // Updates all provider availability so they're unavailable when the salon should be closed
+
+        for(int i=0; i<providers.size(); i++) {
+            providers.get(i).addToSchedule(timesToBeClosed);
         }
     }
 
@@ -166,12 +186,12 @@ public class Salon implements Serializable{
      */
     public float calculateRevenue(String startDate, String endDate) {
         float revenue = 0;
-        Appointment a;
+        BeautyAppointment a;
         DateTimeRange range = new DateTimeRange(startDate, endDate);
         for(int i=0; i<appointments.size(); i++) {
             a = appointments.get(i);
-            if(a.getDateTime().isBefore(range.getEndOfRange()) && a.getDateTime().isAfter(range.getStartOfRange())) {
-                revenue += a.getService().getCost();
+            if(a.getDateTime().getStartOfRange().isBefore(range.getEndOfRange()) && a.getDateTime().getEndOfRange().isAfter(range.getStartOfRange())) {
+                revenue += a.getService().getPrice();
             }
         }
         return revenue;
@@ -179,20 +199,20 @@ public class Salon implements Serializable{
 
     // GETTERS AND SETTERS
 
-    public ArrayList<Appointment> getAppointments() {
+    public ArrayList<BeautyAppointment> getAppointments() {
         return appointments;
     }
 
-    public void setAppointments (ArrayList<Appointment> a) {
+    public void setAppointments (ArrayList<BeautyAppointment> a) {
         appointments = a;
     }
 
-    public ArrayList<Stylist> getStylists() {
-        return stylists;
+    public ArrayList<Provider> getProviders() {
+        return providers;
     }
 
-    public void setStylists (ArrayList<Stylist> styls) {
-        stylists = styls;
+    public void setProviders (ArrayList<Provider> provs) {
+        providers = provs;
     }
 
     public ArrayList<Service> getServices() {
@@ -225,6 +245,14 @@ public class Salon implements Serializable{
 
     public void setLoginPassword(String pass) {
         loginPassword = pass;
+    }
+
+    public int getHourOpen() {
+        return hourOpen;
+    }
+
+    public int getHourClosed() {
+        return hourClosed;
     }
 
 }

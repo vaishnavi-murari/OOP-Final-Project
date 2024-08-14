@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /*
  * Name: Vaishnavi Murari
- * Date: August 12, 2024
+ * Date: August 13, 2024
  */
 public class DateTimeRange implements Serializable{
     private LocalDateTime startDateTime;
@@ -19,9 +19,13 @@ public class DateTimeRange implements Serializable{
     }
 
     public DateTimeRange (String start, String end) {
-        DateTimeFormatter format = DateTimeFormatter.ofPattern("E, MMM dd, yyyy h:mm a");
-        startDateTime = LocalDateTime.parse(start, format);
-        endDateTime = LocalDateTime.parse(end, format);
+        try {
+            DateTimeFormatter form = DateTimeFormatter.ofPattern("E, MMM dd, yyyy h:mm a");
+            startDateTime = LocalDateTime.parse(start, form);
+            endDateTime = LocalDateTime.parse(end, form);
+        } catch (Exception e) {
+            System.out.println("Sorry, could not read the date. Please be sure to enter a valid date in the form: Wed, Aug 14, 2024 2:00 PM");
+        }
     }
 
     /*
@@ -30,10 +34,10 @@ public class DateTimeRange implements Serializable{
      *          false
      */
     public boolean conflictsWith(DateTimeRange other) {
-        if(startDateTime.isBefore(other.getEndOfRange()) || endDateTime.isAfter(other.getStartOfRange())) {
-            return true;
+        if(!(endDateTime.isAfter(other.getStartOfRange())) || !(other.getEndOfRange().isAfter(startDateTime))) {
+            return false;
         }
-        return false;
+        return true;
     }
 
     /*
@@ -50,13 +54,31 @@ public class DateTimeRange implements Serializable{
 
     /*
      * Overrides the Object toString() method
-     * @return  a String of the format "E, MMM dd, yyyy h:mm a - E, MMM dd, yyyy h:mm a"
+     * @return  a String of the format "E, MMM dd h:mm a - E, MMM dd h:mm a"
      */
     public String toString(){
         DateTimeFormatter form = DateTimeFormatter.ofPattern("E, MMM dd, yyyy h:mm a");
         String start = startDateTime.format(form);
         String end = endDateTime.format(form);
         return start + " - " + end;
+    }
+
+    /*
+     * Obtains a String of the start of the range
+     * @return  a String of the format "E, MMM dd, yyyy h:mm a"
+     */
+    public String startToString() {
+        DateTimeFormatter form = DateTimeFormatter.ofPattern("E, MMM dd, yyyy h:mm a");
+        return startDateTime.format(form);
+    }
+
+    /*
+     * Obtains a String of the end of the range
+     * @return  a String of the format "E, MMM dd, yyyy h:mm a"
+     */
+    public String endToString() {
+        DateTimeFormatter form = DateTimeFormatter.ofPattern("E, MMM dd, yyyy h:mm a");
+        return endDateTime.format(form);
     }
 
     // GETTERS AND SETTERS
