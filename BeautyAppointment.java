@@ -2,8 +2,7 @@ import java.time.format.DateTimeFormatter;
 import java.io.Serializable;
 
 /*
- * Name: Vaishnavi Murari
- * Date: August 12, 2024
+ * Last Updated: August 13, 2024
  */
 public abstract class BeautyAppointment implements Serializable{
     private DateTimeRange dateTime;

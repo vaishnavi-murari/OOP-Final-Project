@@ -4,6 +4,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Scanner;
 
+/*
+ * Last Updated: August 13, 2024
+ */
 public class Main {
     public static void main(String[] args){
         // Reads salon data from file "data.bin"

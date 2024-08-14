@@ -1,5 +1,7 @@
 import java.util.ArrayList;
-
+/*
+ * Last Updated: August 13, 2024
+ */
 public class Stylist extends Provider {
 
     public Stylist(){

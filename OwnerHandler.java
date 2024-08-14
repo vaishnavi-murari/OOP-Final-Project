@@ -1,5 +1,8 @@
 import java.util.Scanner;
 
+/*
+ * Last Updated: August 13, 2024
+ */
 public class OwnerHandler {
     private Scanner scanner;
     private Salon salon;

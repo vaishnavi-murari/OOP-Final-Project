@@ -3,8 +3,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /*
- * Name: Vaishnavi Murari
- * Date: August 13, 2024
+ * Last Updated: August 13, 2024
  */
 
 public class ClientHandler {

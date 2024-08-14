@@ -3,8 +3,7 @@ import java.time.format.DateTimeFormatter;
 import java.io.Serializable;
 
 /*
- * Name: Vaishnavi Murari
- * Date: August 13, 2024
+ * Last Updated: August 13, 2024
  */
 public class DateTimeRange implements Serializable{
     private LocalDateTime startDateTime;
